@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService  {
     private final OrderRepo orderRepo;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
     public void placeOrder(OrderRequest orderRequest){
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
@@ -36,8 +36,8 @@ public class OrderService  {
                 .map(OrderLineItems::getSkuCode)
                 .collect(Collectors.toList());
 
-        InventoryResponse[] inventoryResponseArray = webClient.get()
-                .uri("http://localhost:8082/api/inventory",
+        InventoryResponse[] inventoryResponseArray = webClientBuilder.build().get()
+                .uri("http://inventory-service/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode",skuList).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
